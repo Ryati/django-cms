@@ -1,9 +1,6 @@
 from cms.models import Page, CMSPlugin
-from cms.models.moderatormodels import ACCESS_DESCENDANTS, \
-    ACCESS_PAGE_AND_DESCENDANTS
-from cms.models.permissionmodels import PagePermission
-from cms.tests.base import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE, \
-    URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE
+from cms.models.moderatormodels import ACCESS_DESCENDANTS
+from cms.test.testcases import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE
 from cms.utils.permissions import has_generic_permission
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -180,15 +177,15 @@ class PermissionModeratorTestCase(CMSTestCase):
         page = self.approve_page(page)    
         
     def test_07_super_can_add_plugin(self):
-        self.add_plugin(self.user_super)
+        self.add_plugin(self.user_super, page=self.slave_page)
     
     
     def test_08_master_can_add_plugin(self):
-        self.add_plugin(self.user_master)
+        self.add_plugin(self.user_master, page=self.slave_page)
     
     
     def test_09_slave_can_add_plugin(self):
-        self.add_plugin(self.user_slave)
+        self.add_plugin(self.user_slave, page=self.slave_page)
     
     
     def test_10_same_order(self):

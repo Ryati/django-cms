@@ -33,6 +33,8 @@ MEDIA_URL = '/media/'
 
 ADMIN_MEDIA_PREFIX = '/media/admin/'
 
+EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+
 FIXTURE_DIRS = [os.path.join(PROJECT_DIR, 'fixtures')]
 
 SECRET_KEY = '*xq7m@)*f2awoj!spa0(jibsrz9%c0d=e(g)v*!17y(vx0ue_3'
@@ -101,6 +103,7 @@ INSTALLED_APPS = (
     'testapp.placeholderapp',
     'testapp.pluginapp',
     'testapp.pluginapp.plugins.manytomany_rel',
+    'testapp.fakemlng',
     'south',
     'reversion',
 )
@@ -140,17 +143,20 @@ CMS_TEMPLATES = (
 
 CMS_PLACEHOLDER_CONF = {
     'col_sidebar': {
-        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin'),
+        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
+                    'TextPlugin', 'SnippetPlugin'),
         'name': gettext("sidebar column")
     },                    
                         
     'col_left': {
-        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin','GoogleMapPlugin',),
+        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
+                    'TextPlugin', 'SnippetPlugin','GoogleMapPlugin',),
         'name': gettext("left column")
     },                  
                         
     'col_right': {
-        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin', 'TextPlugin', 'SnippetPlugin','GoogleMapPlugin',),
+        'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
+                    'TextPlugin', 'SnippetPlugin','GoogleMapPlugin',),
         'name': gettext("right column")
     },
 }
@@ -164,6 +170,10 @@ CMS_FLAT_URLS = False
 CMS_MENU_TITLE_OVERWRITE = True
 CMS_HIDE_UNTRANSLATED = False
 CMS_URL_OVERWRITE = True
+
+CMS_PLUGIN_PROCESSORS = tuple()
+
+CMS_PLUGIN_CONTEXT_PROCESSORS = tuple()
 
 SOUTH_TESTS_MIGRATE = False
 

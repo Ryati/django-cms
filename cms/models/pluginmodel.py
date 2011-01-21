@@ -42,6 +42,17 @@ class PluginModelBase(ModelBase):
          
     
 class CMSPlugin(Mptt):
+    '''
+    The base class for a CMS plugin model. When defining a new custom plugin, you should
+    store plugin-instance specific information on a subclass of this class.
+    
+    An example for this would be to store the number of pictures to display in a galery.
+
+    Two restrictions apply when subclassing this to use in your own models:
+    1. Subclasses of CMSPlugin *cannot be further subclassed*
+    2. Subclasses of CMSPlugin cannot define a "text" field.
+
+    '''
     __metaclass__ = PluginModelBase
     
     placeholder = models.ForeignKey(Placeholder, editable=False, null=True)
@@ -104,7 +115,11 @@ class CMSPlugin(Mptt):
         return plugin_pool.get_plugin(self.plugin_type).name
     
     def get_short_description(self):
-        return self.get_plugin_instance()[0].__unicode__()        
+        instance = self.get_plugin_instance()[0]
+        if instance:
+            return instance.__unicode__()
+        else:
+            return _("<Empty>")
     
     def get_plugin_class(self):
         from cms.plugin_pool import plugin_pool
@@ -257,9 +272,10 @@ class CMSPlugin(Mptt):
         """
         position = self.position
         slot = self.placeholder.slot
-        if self.page and getattr(self.page, 'publisher_public'):
+        page = get_page_from_placeholder_if_exists(self.placeholder)
+        if page and getattr(page, 'publisher_public'):
             try:
-                placeholder = Placeholder.objects.get(page=self.page.publisher_public, slot=slot)
+                placeholder = Placeholder.objects.get(page=page.publisher_public, slot=slot)
             except Placeholder.DoesNotExist:
                 pass                
             else:
