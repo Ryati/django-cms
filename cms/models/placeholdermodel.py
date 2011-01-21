@@ -42,11 +42,11 @@ class Placeholder(models.Model):
             return True
         return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission())
 
-    def render(self, context, width):
+    def render(self, context, width, height=None):
         from cms.plugin_rendering import render_placeholder
         if not 'request' in context:
             return '<!-- missing request -->'
-        context.update({'width': width or self.default_width})
+        context.update({'width': width or self.default_width,'height':height})
         return render_placeholder(self, context)
 
     def get_media(self, request, context):

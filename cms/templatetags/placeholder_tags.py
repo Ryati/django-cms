@@ -11,9 +11,10 @@ class RenderPlaceholder(Tag):
     options = Options(
         Argument('placeholder'),
         Argument('width', default=None, required=False),
+        Argument('height', default=None, required=False),
     )
 
-    def render_tag(self, context, placeholder, width):
+    def render_tag(self, context, placeholder, width, height):
         request = context.get('request', None)
         if not request:
             return ''
@@ -21,5 +22,5 @@ class RenderPlaceholder(Tag):
             return ''
         if hasattr(request, 'placeholder_media'):
             request.placeholder_media += placeholder.get_media(request, context)
-        return safe(placeholder.render(context, width))
+        return safe(placeholder.render(context, width, height))
 register.tag(RenderPlaceholder)
