@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.utils.translation import get_language
 from django.utils.encoding import smart_str
 
@@ -65,4 +66,11 @@ class NavigationNode(object):
         for node in self.children:
             nodes.append(node)
             nodes += node.get_descendants()
+        return nodes
+
+    def get_ancestors(self):
+        nodes = []
+        if self.parent:
+            nodes.append(self.parent)
+            nodes += self.parent.get_ancestors()
         return nodes

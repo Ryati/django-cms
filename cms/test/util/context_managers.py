@@ -1,9 +1,13 @@
+# -*- coding: utf-8 -*-
 from django.conf import settings
 from django.utils.translation import get_language, activate
 from shutil import rmtree as _rmtree
 from tempfile import template, mkdtemp, _exists
 import StringIO
 import sys
+
+class NULL:
+    pass
 
 class SettingsOverride(object):
     """
@@ -15,18 +19,22 @@ class SettingsOverride(object):
         with SettingsOverride(DEBUG=True):
             # do something
     """
+    
     def __init__(self, **overrides):
         self.overrides = overrides
         
     def __enter__(self):
         self.old = {}
         for key, value in self.overrides.items():
-            self.old[key] = getattr(settings, key)
+            self.old[key] = getattr(settings, key, NULL)
             setattr(settings, key, value)
         
     def __exit__(self, type, value, traceback):
         for key, value in self.old.items():
-            setattr(settings, key, value)
+            if value is not NULL:
+                setattr(settings, key, value)
+            else:
+                del settings[key] # do not pollute the context!
 
 
 class StdoutOverride(object):
@@ -89,6 +97,7 @@ class TemporaryDirectory:
     def __exit__(self, exc, value, tb):
         self.cleanup()
 
+
 class UserLoginContext(object):
     def __init__(self, testcase, user):
         self.testcase = testcase
@@ -100,3 +109,30 @@ class UserLoginContext(object):
     def __exit__(self, exc, value, tb):
         self.testcase.user = None
         self.testcase.client.logout()
+
+
+class ChangeModel(object):
+    """
+    Changes attributes on a model while within the context.
+    
+    These changes *ARE* saved to the database for the context!
+    """
+    def __init__(self, instance, **overrides):
+        self.instance = instance
+        self.overrides = overrides
+        
+    def __enter__(self):
+        self.old = {}
+        for key, value in self.overrides.items():
+            self.old[key] = getattr(self.instance, key, NULL)
+            setattr(self.instance, key, value)
+        self.instance.save()
+        
+    def __exit__(self, exc, value, tb):
+        for key in self.overrides.keys():
+            old_value = self.old[key]
+            if old_value is NULL:
+                delattr(self.instance, key)
+            else:
+                setattr(self.instance, key, old_value)
+        self.instance.save()
