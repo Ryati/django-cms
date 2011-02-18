@@ -53,6 +53,8 @@ class ToolbarMiddleware(object):
                 return False
         except NoReverseMatch:
             pass
+        if request.path.startswith("/settings"):
+            return False
         if is_media_request(request):
             return False
         if "edit" in request.GET:
