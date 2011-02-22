@@ -40,6 +40,8 @@ class ToolbarMiddleware(object):
     """
 
     def show_toolbar(self, request, response):
+        if getattr(request, 'no_toolbar', False):
+            return False
         if getattr(request, 'view_func', None) is serve:
             return False
         if request.is_ajax():
