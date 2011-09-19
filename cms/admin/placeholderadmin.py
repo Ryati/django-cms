@@ -12,6 +12,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.defaultfilters import force_escape, escapejs
 from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 import os
 
 
@@ -118,7 +119,8 @@ class PlaceholderAdmin(ModelAdmin):
             pat(r'copy-plugins/$', self.copy_plugins),            
         )
         return url_patterns + super(PlaceholderAdmin, self).get_urls()
-    
+
+    @csrf_exempt
     def add_plugin(self, request):
         if request.method != "POST":
             raise Http404
@@ -140,6 +142,7 @@ class PlaceholderAdmin(ModelAdmin):
         plugin.save()
         return HttpResponse(str(plugin.pk))
     
+    @csrf_exempt
     def edit_plugin(self, request, plugin_id):
         plugin_id = int(plugin_id)
         cms_plugin = get_object_or_404(CMSPlugin, pk=plugin_id)
@@ -181,7 +184,8 @@ class PlaceholderAdmin(ModelAdmin):
             return render_to_response('admin/cms/page/plugin_forms_ok.html', context, RequestContext(request))
             
         return response
-
+    
+    @csrf_exempt
     def move_plugin(self, request):
         if request.method == "POST":
             pos = 0
@@ -205,6 +209,7 @@ class PlaceholderAdmin(ModelAdmin):
         else:
             return HttpResponse(str("error"))
     
+    @csrf_exempt
     def remove_plugin(self, request):
         if request.method == "POST":
             plugin_id = request.POST['plugin_id']
@@ -216,6 +221,7 @@ class PlaceholderAdmin(ModelAdmin):
             return HttpResponse("%s,%s" % (plugin_id, comment))
         raise Http404
     
+    @csrf_exempt
     def copy_plugins(self, request):
         if request.method != "POST":
             raise Http404
