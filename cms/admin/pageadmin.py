@@ -45,6 +45,7 @@ from django.template.context import RequestContext
 from django.template.defaultfilters import title, escape, force_escape, escapejs
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.csrf import csrf_exempt
 from menus.menu_pool import menu_pool
 import os
 
@@ -272,6 +273,7 @@ class PageAdmin(model_admin):
             make_revision_with_plugins(obj)
 
     @create_on_success
+    @csrf_exempt
     def change_template(self, request, object_id):
         page = get_object_or_404(Page, pk=object_id)
         if page.has_change_permission(request):
@@ -767,6 +769,7 @@ class PageAdmin(model_admin):
         return change_list
 
     @transaction.commit_on_success
+    @csrf_exempt
     def move_page(self, request, page_id, extra_context=None):
         """
         Move the page to the requested target, at the given position
@@ -828,6 +831,7 @@ class PageAdmin(model_admin):
         return render_to_response('admin/cms/page/permissions.html', context)
 
     @transaction.commit_on_success
+    @csrf_exempt
     def copy_page(self, request, page_id, extra_context=None):
         """
         Copy the page and all its plugins and descendants to the requested target, at the given position
@@ -898,6 +902,7 @@ class PageAdmin(model_admin):
 
 
     @transaction.commit_on_success
+    @csrf_exempt
     def publish_page(self, request, page_id):
         page = get_object_or_404(Page, id=page_id)
         # ensure user has permissions to publish this page
@@ -911,6 +916,7 @@ class PageAdmin(model_admin):
         return HttpResponseRedirect( path )
 
 
+    @csrf_exempt
     def delete_view(self, request, object_id, *args, **kwargs):
         """If page is under modaretion, just mark this page for deletion = add
         delete action to page states.
@@ -934,6 +940,7 @@ class PageAdmin(model_admin):
         return response
 
     @create_on_success
+    @csrf_exempt
     def delete_translation(self, request, object_id, extra_context=None):
 
         language = get_language_from_request(request)
@@ -1042,6 +1049,7 @@ class PageAdmin(model_admin):
             url = "http://%s%s" % (instance.site.domain, url)
         return HttpResponseRedirect(url)
 
+    @csrf_exempt
     def change_status(self, request, page_id):
         """
         Switch the status of a page
@@ -1056,6 +1064,7 @@ class PageAdmin(model_admin):
         else:
             return HttpResponseForbidden(unicode(_("You do not have permission to publish this page")))
 
+    @csrf_exempt
     def change_innavigation(self, request, page_id):
         """
         Switch the in_navigation of a page
@@ -1073,6 +1082,7 @@ class PageAdmin(model_admin):
         return HttpResponseForbidden(_("You do not have permission to change this page's in_navigation status"))
 
     @create_on_success
+    @csrf_exempt
     def add_plugin(self, request):
         if 'history' in request.path or 'recover' in request.path:
             return HttpResponse(str("error"))
@@ -1138,6 +1148,7 @@ class PageAdmin(model_admin):
 
     @create_on_success
     @transaction.commit_on_success
+    @csrf_exempt
     def copy_plugins(self, request):
         if 'history' in request.path or 'recover' in request.path:
             return HttpResponse(str("error"))
@@ -1168,6 +1179,7 @@ class PageAdmin(model_admin):
         raise Http404
 
     @create_on_success
+    @csrf_exempt
     def edit_plugin(self, request, plugin_id):
         plugin_id = int(plugin_id)
         if not 'history' in request.path and not 'recover' in request.path:
@@ -1262,6 +1274,7 @@ class PageAdmin(model_admin):
         return response
 
     @create_on_success
+    @csrf_exempt
     def move_plugin(self, request):
         if request.method == "POST" and not 'history' in request.path:
             pos = 0
@@ -1307,6 +1320,7 @@ class PageAdmin(model_admin):
             return HttpResponse(str("error"))
 
     @create_on_success
+    @csrf_exempt
     def remove_plugin(self, request):
         if request.method == "POST" and not 'history' in request.path:
             plugin_id = request.POST['plugin_id']
@@ -1337,6 +1351,7 @@ class PageAdmin(model_admin):
             return HttpResponse("%s,%s" % (plugin_id, comment))
         raise Http404
 
+    @csrf_exempt
     def change_moderation(self, request, page_id):
         """Called when user clicks on a moderation checkbox in tree vies, so if he
         wants to add/remove/change moderation required by him. Moderate is sum of
