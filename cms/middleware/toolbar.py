@@ -40,6 +40,8 @@ class ToolbarMiddleware(object):
     """
 
     def show_toolbar(self, request, response):
+        if getattr(request, 'no_toolbar', False):
+            return False
         if getattr(request, 'view_func', None) is serve:
             return False
         if request.is_ajax():
@@ -47,8 +49,6 @@ class ToolbarMiddleware(object):
         if response.status_code != 200:
             return False
         if not response['Content-Type'].split(';')[0] in HTML_TYPES:
-            return False
-        if 'clerk/' in request.path:
             return False
         try:
             if request.path.startswith(reverse("admin:index")):
