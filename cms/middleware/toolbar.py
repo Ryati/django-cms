@@ -48,6 +48,8 @@ class ToolbarMiddleware(object):
             return False
         if not response['Content-Type'].split(';')[0] in HTML_TYPES:
             return False
+        if 'clerk/' in request.path:
+            return False
         try:
             if request.path.startswith(reverse("admin:index")):
                 return False
